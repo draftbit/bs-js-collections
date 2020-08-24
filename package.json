@@ -5,7 +5,8 @@
   "scripts": {
     "re:clean": "bsb -clean-world",
     "re:build": "bsb -make-world",
-    "re:watch": "bsb -make-world -w"
+    "re:watch": "bsb -make-world -w",
+    "test": "jest __tests__/*.bs.js"
   },
   "keywords": [
     "BuckleScript"
@@ -20,8 +21,14 @@
     ]
   },
   "license": "MIT",
-  "peerDependencies": { "bs-platform": "^7 || ^8" },
+  "peerDependencies": {
+    "bs-platform": "^7 || ^8"
+  },
   "devDependencies": {
-    "bs-platform": "^8"
+    "bs-platform": "^8",
+    "jest": "^26.4.2",
+    "lint-staged": "^10.2.11",
+    "prettier": "^2.1.0",
+    "reason-jest": "^2.2.0"
   }
 }

@@ -1,7 +1,7 @@
 {
   "name": "bs-js-collections",
   "description": "Bindings to JavaScript primitive Set and Map types",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "scripts": {
     "re:clean": "bsb -clean-world",
     "re:build": "bsb -make-world",

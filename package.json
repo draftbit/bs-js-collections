@@ -1,0 +1,27 @@
+{
+  "name": "bs-js-collections",
+  "description": "Bindings to JavaScript primitive Set and Map types",
+  "version": "0.1.0",
+  "scripts": {
+    "re:clean": "bsb -clean-world",
+    "re:build": "bsb -make-world",
+    "re:watch": "bsb -make-world -w"
+  },
+  "keywords": [
+    "BuckleScript"
+  ],
+  "author": "",
+  "lint-staged": {
+    "*.{re,rei}": [
+      "bsrefmt --in-place"
+    ],
+    "*.{json,yaml}": [
+      "prettier --write"
+    ]
+  },
+  "license": "MIT",
+  "peerDependencies": { "bs-platform": "^7 || ^8" },
+  "devDependencies": {
+    "bs-platform": "^8"
+  }
+}

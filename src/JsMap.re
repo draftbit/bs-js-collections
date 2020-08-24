@@ -60,7 +60,7 @@ let valuesList: 'k 'a. t('k, 'a) => list('a) =
   m => m->valuesArray->Belt.List.fromArray;
 
 // Map a function over the values in a map.
-let map: (t('k, 'a), 'a => 'b) => t('k, 'b) =
+let map: 'k 'a. (t('k, 'a), 'a => 'b) => t('k, 'b) =
   (m, f) => {
     let output = empty();
     m->forEachWithKey((k, v) => output->setMut(k, f(v))->ignore);
@@ -68,14 +68,14 @@ let map: (t('k, 'a), 'a => 'b) => t('k, 'b) =
   };
 
 // Map a function over the key/value pairs in a dict.
-let mapWithKey: (t('k, 'a), (string, 'a) => 'b) => t('k, 'b) =
+let mapWithKey: 'k 'a. (t('k, 'a), ('k, 'a) => 'b) => t('k, 'b) =
   (m, f) => {
     let output = empty();
     m->forEachWithKey((k, v) => output->setMut(k, f(k, v))->ignore);
     output;
   };
 
-let keep: (t('k, 'a), 'a => bool) => t('k, 'a) =
+let keep: 'k 'a. (t('k, 'a), 'a => bool) => t('k, 'a) =
   (m, f) => {
     let output = empty();
     m->forEachWithKey((k, v) =>
@@ -86,7 +86,7 @@ let keep: (t('k, 'a), 'a => bool) => t('k, 'a) =
     output;
   };
 
-let keepWithKey: (t('k, 'a), ('k, 'a) => bool) => t('k, 'a) =
+let keepWithKey: 'k 'a. (t('k, 'a), ('k, 'a) => bool) => t('k, 'a) =
   (m, f) => {
     let output = empty();
     m->forEachWithKey((k, v) =>
@@ -97,7 +97,7 @@ let keepWithKey: (t('k, 'a), ('k, 'a) => bool) => t('k, 'a) =
     output;
   };
 
-let keepMap: (t('k, 'a), 'a => option('b)) => t('k, 'b) =
+let keepMap: 'k 'a 'b. (t('k, 'a), 'a => option('b)) => t('k, 'b) =
   (m, f) => {
     let output = empty();
     m->forEachWithKey((k, v) => {
@@ -109,7 +109,7 @@ let keepMap: (t('k, 'a), 'a => option('b)) => t('k, 'b) =
     output;
   };
 
-let keepMapWithKey: (t('k, 'a), ('k, 'a) => option('b)) => t('k, 'b) =
+let keepMapWithKey: 'k 'a 'b. (t('k, 'a), ('k, 'a) => option('b)) => t('k, 'b) =
   (m, f) => {
     let output = empty();
     m->forEachWithKey((k, v) => {
@@ -125,16 +125,16 @@ let keepMapWithKey: (t('k, 'a), ('k, 'a) => option('b)) => t('k, 'b) =
 let copy: 'k 'a. t('k, 'a) => t('k, 'a) = m => m->toArray->fromArray;
 
 // Set a key in a dictionary, producing a new dictionary.
-let setPure: (t('k, 'a), string, 'a) => t('k, 'a) =
+let setPure:  'k 'a. (t('k, 'a), 'k, 'a) => t('k, 'a) =
   (m, k, v) =>
   m->copy->setMut(k, v);
 
 // Create a map with a single key and value
-let singleton: (string, 'a) => t('k, 'a) = (k, v) => fromArray([|(k, v)|]);
+let singleton:  'k 'a. ('k, 'a) => t('k, 'a) = (k, v) => fromArray([|(k, v)|]);
 
 // Get or throw an exception if the key is not found. You can customize the
-// exception with the missing key
-let getOrRaise: (t('k, 'v), 'k, 'k => exn) => 'v =
+// exception with the missing key.
+let getOrRaise:  'k 'a. (t('k, 'a), 'k, 'k => exn) => 'a =
   (m, k, toExn) =>
     switch (get(m, k)) {
     | None => raise(k->toExn)
@@ -143,7 +143,7 @@ let getOrRaise: (t('k, 'v), 'k, 'k => exn) => 'v =
 
 // Look up the key in the dictionary; if it's not in it, add the
 // given default to the map and then return it.
-let getOrSetDefaultMut: (t('k, 'v), 'k, 'v) => 'v =
+let getOrSetDefaultMut: (t('k, 'a), 'k, 'a) => 'a =
   (m, k, default) =>
     switch (m->get(k)) {
     | None =>

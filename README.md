@@ -27,7 +27,8 @@ Js.log(myStringMap->Js.Map.get("y")); // 2
 See unit tests for more examples. In addition a number of higher-level
 utility functions are included, such as `map`, `keep`, `keepMap`, etc.
 In general we try to follow naming conventions similar to `Belt` and
-a pipe-first style.
+a pipe-first style. Note that many of these functions still require tests,
+so use with caution and your own testing.
 
 ## Usable types
 

@@ -1,5 +1,11 @@
 // Interface to the primitive Set type in JS. In practice, 'a
-// must be a type that JavaScript is able to handle, so use carefully.
+// must be a type that JavaScript is able to handle, so use carefully:
+//
+// * Primitive types (string, int, bool, undefined, null) work fine
+// * Abstract versions of those types
+// * Enums which have a primitive representation such as `Blue or `utf8
+// * `option` versions of the above, although *NESTED OPTIONS WON'T WORK*
+//
 type t('a);
 
 [@bs.new] external empty: unit => t('a) = "Set";

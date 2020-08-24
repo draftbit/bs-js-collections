@@ -63,10 +63,25 @@ module SetTests = {
       expect(set->toArray)->toEqual([|"foo", "bar"|]);
       expect(set->toList)->toEqual(["foo", "bar"]);
     });
-    test("intss", () => {
+    test("ints", () => {
       let set = fromArray([|123, 456|]);
       expect(set->has(123))->toEqual(true);
     });
+    test("option values", () => {
+      let set = fromArray([|Some(1), Some(123), None|]);
+      expect(set->has(Some(1)))->toBe(true);
+      expect(set->has(None))->toBe(true);
+    });
+
+    // This is a known failure case!
+    Skip.test("nested option values", () => {
+      let set =
+        fromArray([|Some(Some(1)), Some(Some(123)), Some(None), None|]);
+      expect(set->has(Some(Some(1))))->toBe(true);
+      expect(set->has(Some(None)))->toBe(true);
+      expect(set->has(None))->toBe(true);
+    });
+
     test("mutable operations", () => {
       let set = fromArray([|123|]);
       let _ = set->addMut(456);

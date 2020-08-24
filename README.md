@@ -25,6 +25,23 @@ Js.log(myStringMap->Js.Map.get("y")); // 2
 
 See unit tests for more examples.
 
+## Usable types
+
+One of the advantages of `JsMap.t` over `Js.Dict.t` is to allow arbitrary
+key types (e.g. numbers). Similarly for the values allowable
+in `JsSet.t`. The compiler will set values and map keys to be any type,
+but in practice only certain types will work. In particular, it must be
+a type at runtime that JavaScript is able to handle.
+
+The rule of thumb is that for map keys and set values, it must be a type
+which, at runtime, takes the form of an int, a string, a boolean, etc. This
+means that most enums are fine, as are opaque wrapper types.
+
+**Do not** use records, lists, arrays, tuples, etc.
+
+**Avoid** optional types in general or at the least provide extra testing
+if it's unavoidable.
+
 ## Commands/scripts
 
 ```

@@ -29,7 +29,20 @@ module MapTests = {
       expect(deleted)->toBe(true);
       expect(map)->toEqual(fromArray([|(456, "qux")|]));
     });
-    test("option values (DO NOT USE)", () => {
+
+    test("option keys", () =>
+      expect([|(Some(1), "x")|]->fromArray->get(Some(1)))
+      ->toEqual(Some("x"))
+    );
+
+    Skip.test("option values (AVOID IF POSSIBLE)", () => {
+      let m = [|(1, Some("x")), (2, None)|]->fromArray;
+      expect(m->get(1))->toEqual(Some(Some("x")));
+    // Known failure
+      expect(m->get(2))->toEqual(Some(None));
+    });
+
+    Skip.test("nested option values (AVOID IF POSSIBLE)", () => {
       let map =
         fromArray([|
           ("x", Some(None)),
@@ -38,8 +51,8 @@ module MapTests = {
         |]);
       expect(map->get("x"))->toEqual(Some(Some(None)));
       expect(map->get("y"))->toEqual(Some(Some(Some(123))));
-      // NOTE this is a known fail and why option values shouldn't be used
-      //    expect(map->get("z"))->toEqual(Some(None));
+      // NOTE this is the known fail and why option values shouldn't be used
+      expect(map->get("z"))->toEqual(Some(None));
       expect(map->get("xxx"))->toEqual(None);
     });
 

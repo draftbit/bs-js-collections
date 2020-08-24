@@ -1,6 +1,7 @@
 # `bs-js-collections`
 
-Bindings to primitive JavaScript `Set` and `Map` types for BuckleScript/ReScript.
+Bindings to primitive JavaScript `Set` and `Map` types for BuckleScript/ReScript, plus
+some useful bells and whistles.
 
 ## Examples
 
@@ -23,7 +24,10 @@ Js.log(myStringMap->JsMap.has("y")); // true
 Js.log(myStringMap->Js.Map.get("y")); // 2
 ```
 
-See unit tests for more examples.
+See unit tests for more examples. In addition a number of higher-level
+utility functions are included, such as `map`, `keep`, `keepMap`, etc.
+In general we try to follow naming conventions similar to `Belt` and
+a pipe-first style.
 
 ## Usable types
 

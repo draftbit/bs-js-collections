@@ -38,7 +38,7 @@ module MapTests = {
     Skip.test("option values (AVOID IF POSSIBLE)", () => {
       let m = [|(1, Some("x")), (2, None)|]->fromArray;
       expect(m->get(1))->toEqual(Some(Some("x")));
-    // Known failure
+      // Known failure
       expect(m->get(2))->toEqual(Some(None));
     });
 
@@ -56,11 +56,24 @@ module MapTests = {
       expect(map->get("xxx"))->toEqual(None);
     });
 
-    test("forEachValue", () => {
+    test("forEach", () => {
       let map = fromArray([|("a", 1), ("b", 2), ("c", 3)|]);
       let sum = ref(0);
-      map->forEachValue(n => sum := sum^ + n);
+      map->forEach(n => sum := sum^ + n);
       expect(sum^)->toEqual(6);
+    });
+
+    test("forEachWithKey", () => {
+      let map = fromArray([|("a", 1), ("b", 2), ("c", 3)|]);
+      let sum = ref(0);
+      map->forEachWithKey((k, n) => sum := sum^ + n + k->Js.String.length);
+      expect(sum^)->toEqual(9);
+    });
+
+    test("map", () => {
+      let m = fromArray([|("a", 1), ("b", 2), ("c", 3)|]);
+      let m' = m->map(n => n + 1);
+      expect(m'->get("b"))->toEqual(Some(3));
     });
   });
 };

@@ -15,7 +15,7 @@ type t('a);
 external toArrayLike: t('a) => Js.Array.array_like('a) = "%identity";
 let toList: t('a) => list('a) = s => s->toArray->Belt.List.fromArray;
 [@bs.send] external has: (t('a), 'a) => bool = "has";
-[@bs.send] external size: t('a) => int = "size";
+[@bs.get] external size: t('a) => int = "size";
 
 // This is a mutating operation
 [@bs.send] external addMut: (t('a), 'a) => t('a) = "add";

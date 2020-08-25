@@ -6,6 +6,7 @@ module MapTests = {
   describe("Map", () => {
     test("string keys", () => {
       let map = fromArray([|("foo", "bar")|]);
+      expect(map->size)->toEqual(1);
       expect(map->get("foo"))->toEqual(Some("bar"));
       expect(map->has("foo"))->toBe(true);
       expect(map->get("qux"))->toEqual(None);
@@ -84,6 +85,7 @@ module SetTests = {
   describe("Set", () => {
     test("strings", () => {
       let set = fromArray([|"foo", "bar"|]);
+      expect(set->size)->toEqual(2);
       expect(set->has("foo"))->toBe(true);
       expect(set->has("qux"))->toBe(false);
       expect(set->toArray)->toEqual([|"foo", "bar"|]);

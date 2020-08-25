@@ -31,7 +31,7 @@ let toList: 'k 'a. t('k, 'a) => list(('k, 'a)) =
 external get: (t('k, 'v), 'k) => option('v) = "get";
 
 // How many key/value pairs in the map
-[@bs.send] external size: t('k, 'a) => int = "size";
+[@bs.get] external size: t('k, 'a) => int = "size";
 
 // Adding the `Mut` suffix to clarify that this is not a pure operation
 [@bs.send] external setMut: (t('k, 'v), 'k, 'v) => t('k, 'v) = "set";

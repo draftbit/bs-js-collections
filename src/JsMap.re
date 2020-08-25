@@ -69,33 +69,45 @@ let valuesArray: 'k 'a. t('k, 'a) => array('a) =
 let valuesList: 'k 'a. t('k, 'a) => list('a) =
   m => m->valuesArray->Belt.List.fromArray;
 
+// Reduce over the values in the map (ignoring keys).
+let reduce: 'k 'a 'b. (t('k, 'a), 'b, ('b, 'a) => 'b) => 'b =
+  (map, start, f) => map->valuesArray->Belt.Array.reduce(start, f);
+
+// Reduce over keys and values in the map.
+let reduceWithKey: 'k 'a 'b. (t('k, 'a), 'b, ('b, 'k, 'a) => 'b) => 'b =
+  (map, start, f) =>
+    map->toArray->Belt.Array.reduce(start, (out, (k, v)) => f(out, k, v));
+
+// Map a function over a map, altering keys and/or values.
+// Note that if the function returns the same key twice, values will be
+// eliminated from the map!
+let mapEntries:
+  'k1 'k2 'a 'b.
+  (t('k1, 'a), ('k1, 'a) => ('k2, 'b)) => t('k2, 'b)
+ =
+  (m, f) => {
+    let output = empty();
+    m->forEachWithKey((k, v) => {
+      let (k2, v2) = f(k, v);
+      output->setMut(k2, v2)->ignore;
+    });
+    output;
+  };
+
+// Map a function over the key/value pairs in a map, altering values
+let mapWithKey: 'k 'a 'b. (t('k, 'a), ('k, 'a) => 'b) => t('k, 'b) =
+  (m, f) => m->mapEntries((k, v) => (k, f(k, v)));
+
 // Map a function over the values in a map.
 let map: 'k 'a. (t('k, 'a), 'a => 'b) => t('k, 'b) =
-  (m, f) => {
-    let output = empty();
-    m->forEachWithKey((k, v) => output->setMut(k, f(v))->ignore);
-    output;
-  };
+  (m, f) => m->mapEntries((k, v) => (k, f(v)));
 
-// Map a function over the key/value pairs in a dict.
-let mapWithKey: 'k 'a. (t('k, 'a), ('k, 'a) => 'b) => t('k, 'b) =
-  (m, f) => {
-    let output = empty();
-    m->forEachWithKey((k, v) => output->setMut(k, f(k, v))->ignore);
-    output;
-  };
+// Map a function over the keys in a map. Note that if this function returns
+// duplicate values for the same key, values will be removed.
+let mapKeys: 'k1 'k2 'a. (t('k1, 'a), 'k1 => 'k2) => t('k2, 'a) =
+  (m, f) => m->mapEntries((k, v) => (f(k), v));
 
-let keep: 'k 'a. (t('k, 'a), 'a => bool) => t('k, 'a) =
-  (m, f) => {
-    let output = empty();
-    m->forEachWithKey((k, v) =>
-      if (f(v)) {
-        output->setMut(k, v)->ignore;
-      }
-    );
-    output;
-  };
-
+// Filter a map by applying a predicate to keys and values.
 let keepWithKey: 'k 'a. (t('k, 'a), ('k, 'a) => bool) => t('k, 'a) =
   (m, f) => {
     let output = empty();
@@ -107,18 +119,15 @@ let keepWithKey: 'k 'a. (t('k, 'a), ('k, 'a) => bool) => t('k, 'a) =
     output;
   };
 
-let keepMap: 'k 'a 'b. (t('k, 'a), 'a => option('b)) => t('k, 'b) =
-  (m, f) => {
-    let output = empty();
-    m->forEachWithKey((k, v) => {
-      switch (f(v)) {
-      | None => ()
-      | Some(newV) => output->setMut(k, newV)->ignore
-      }
-    });
-    output;
-  };
+// Filter a map by applying a predicate to values.
+let keep: 'k 'a. (t('k, 'a), 'a => bool) => t('k, 'a) =
+  (m, f) => keepWithKey(m, (_, v) => f(v));
 
+// Filter a map by applying a predicate to keys.
+let keepKeys: 'k 'a. (t('k, 'a), 'k => bool) => t('k, 'a) =
+  (m, f) => keepWithKey(m, (k, _) => f(k));
+
+// Filter and transform values at the same time using both keys and values.
 let keepMapWithKey:
   'k 'a 'b.
   (t('k, 'a), ('k, 'a) => option('b)) => t('k, 'b)
@@ -133,6 +142,9 @@ let keepMapWithKey:
     });
     output;
   };
+
+let keepMap: 'k 'a 'b. (t('k, 'a), 'a => option('b)) => t('k, 'b) =
+  (m, f) => m->keepMapWithKey((_, v) => f(v));
 
 // Create a copy of the map
 let copy: 'k 'a. t('k, 'a) => t('k, 'a) = m => m->toArray->fromArray;
@@ -193,3 +205,14 @@ let toIntBeltMap: t(int, 'a) => Belt.Map.Int.t('a) =
 // mixing with encoders in `@glennsl/bs-json` (although it works standalone)
 let toJson = (innerToJson, m): Js.Json.t =>
   m->map(innerToJson)->toDict->Js.Json.object_;
+
+let union: 'a. (t('k, 'a), t('k, 'a)) => t('k, 'a) =
+  (map1, map2) =>
+    map2->reduceWithKey(
+      map1->reduceWithKey(empty(), (m, k, v) => m->setMut(k, v)), (m, k, v) =>
+      m->setMut(k, v)
+    );
+let intersection: 'a. (t('k, 'a), t('k, 'a)) => t('k, 'a) =
+  (map1, map2) => map1->keepKeys(map2->has);
+let diff: 'a. (t('k, 'a), t('k, 'a)) => t('k, 'a) =
+  (map1, map2) => map1->keepKeys(e => !map2->has(e));

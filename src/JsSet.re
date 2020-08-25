@@ -26,6 +26,9 @@ let toList: t('a) => list('a) = s => s->toArray->Belt.List.fromArray;
 [@bs.send]
 external forEach: (t('a), [@bs.uncurry] ('a => unit)) => unit = "forEach";
 
+let reduce: 'a 'b. (t('a), 'b, ('b, 'a) => 'b) => 'b =
+  (set, start, f) => set->toArray->Belt.Array.reduce(start, f);
+
 // Map a function over the values in a map. Note that the output type
 // must also be hashable -- this is on the developer to get right :)
 let map: (t('a), 'a => 'b) => t('b) =
@@ -57,6 +60,13 @@ let keepMap: (t('a), 'a => option('b)) => t('b) =
     });
     output;
   };
+
+let union: 'a. (t('a), t('a)) => t('a) =
+  (set1, set2) => set2->reduce(set1->reduce(empty(), addMut), addMut);
+let intersection: 'a. (t('a), t('a)) => t('a) =
+  (set1, set2) => set1->keep(set2->has);
+let diff: 'a. (t('a), t('a)) => t('a) =
+  (set1, set2) => set1->keep(e => !set2->has(e));
 
 // Create a copy of the map
 let copy: 'k 'a. t('a) => t('a) = s => s->toArray->fromArray;

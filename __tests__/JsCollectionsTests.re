@@ -31,6 +31,39 @@ module MapTests = {
       expect(map)->toEqual(fromArray([|(456, "qux")|]));
     });
 
+    test("mapping a function over a Map", () => {
+      let map1 = fromArray([|(1, 10), (2, 20), (3, 30)|]);
+      expect(map1->map(string_of_int)->valuesArray)
+      ->toEqual([|"10", "20", "30"|]);
+      expect(map1->mapKeys(string_of_int)->toArray)
+      ->toEqual([|("1", 10), ("2", 20), ("3", 30)|]);
+    });
+
+    test("reduce/reduceWithKey", () => {
+      let map = fromArray([|(123, "bar"), (456, "baz"), (789, "qux")|]);
+
+      expect(map->reduce("", (s1, s2) => s1 ++ s2))->toEqual("barbazqux");
+      expect(
+        map->reduceWithKey("", (s1, i, s2) => s1 ++ i->string_of_int ++ s2),
+      )
+      ->toEqual("123bar456baz789qux");
+    });
+
+    test("set operations", () => {
+      let map1 = fromArray([|(1, 10), (2, 20), (3, 30)|]);
+      let map2 = fromArray([|(4, 40), (5, 50), (6, 60)|]);
+      let map3 = fromArray([|(3, 30), (4, 40), (5, 50)|]);
+      expect(map1->diff(map2))->toEqual(map1);
+      expect(map2->diff(map3))->toEqual(singleton(6, 60));
+      expect(map1->union(map2)->keysArray)->toEqual([|1, 2, 3, 4, 5, 6|]);
+      expect(map1->union(map3))
+      ->toEqual(
+          fromArray([|(1, 10), (2, 20), (3, 30), (4, 40), (5, 50)|]),
+        );
+      expect(map2->intersection(map3))
+      ->toEqual(fromArray([|(4, 40), (5, 50)|]));
+    });
+
     test("option keys", () =>
       expect([|(Some(1), "x")|]->fromArray->get(Some(1)))
       ->toEqual(Some("x"))
@@ -69,12 +102,6 @@ module MapTests = {
       let sum = ref(0);
       map->forEachWithKey((k, n) => sum := sum^ + n + k->Js.String.length);
       expect(sum^)->toEqual(9);
-    });
-
-    test("map", () => {
-      let m = fromArray([|("a", 1), ("b", 2), ("c", 3)|]);
-      let m' = m->map(n => n + 1);
-      expect(m'->get("b"))->toEqual(Some(3));
     });
   });
 };
@@ -118,11 +145,29 @@ module SetTests = {
       expect(deleted)->toBe(true);
       expect(set)->toEqual(fromArray([|456|]));
     });
+
     test("forEach", () => {
       let set = fromArray([|1, 2, 3|]);
       let sum = ref(0);
       set->forEach(n => sum := sum^ + n);
       expect(sum^)->toEqual(6);
+    });
+
+    test("mapping a function over a Set", () => {
+      let set1 = fromArray([|10, 20, 30|]);
+      expect(set1->map(string_of_int)->toArray)
+      ->toEqual([|"10", "20", "30"|]);
+    });
+
+    test("set operations", () => {
+      let set1 = fromArray([|1, 2, 3|]);
+      let set2 = fromArray([|4, 5, 6|]);
+      let set3 = fromArray([|3, 4, 5|]);
+      expect(set1->diff(set2))->toEqual(set1);
+      expect(set2->diff(set3))->toEqual(singleton(6));
+      expect(set1->union(set2))->toEqual(fromArray([|1, 2, 3, 4, 5, 6|]));
+      expect(set1->union(set3))->toEqual(fromArray([|1, 2, 3, 4, 5|]));
+      expect(set2->intersection(set3))->toEqual(fromArray([|4, 5|]));
     });
   });
 };

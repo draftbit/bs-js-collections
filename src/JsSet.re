@@ -15,6 +15,7 @@ type t('a);
 external toArrayLike: t('a) => Js.Array.array_like('a) = "%identity";
 let toList: t('a) => list('a) = s => s->toArray->Belt.List.fromArray;
 [@bs.send] external has: (t('a), 'a) => bool = "has";
+[@bs.send] external size: t('a) => int = "size";
 
 // This is a mutating operation
 [@bs.send] external addMut: (t('a), 'a) => t('a) = "add";
@@ -22,22 +23,22 @@ let toList: t('a) => list('a) = s => s->toArray->Belt.List.fromArray;
 // This is a mutating operation
 [@bs.send] external deleteMut: (t('a), 'a) => bool = "delete";
 
-[@bs.send] external forEachU: (t('a), (. 'a) => unit) => unit = "forEach";
-let forEach = (set, f) => set->forEachU((. x) => f(x));
+[@bs.send]
+external forEach: (t('a), [@bs.uncurry] ('a => unit)) => unit = "forEach";
 
 // Map a function over the values in a map. Note that the output type
 // must also be hashable -- this is on the developer to get right :)
 let map: (t('a), 'a => 'b) => t('b) =
   (s, f) => {
     let output = empty();
-    s->forEach((v) => output->addMut(f(v))->ignore);
+    s->forEach(v => output->addMut(f(v))->ignore);
     output;
   };
 
 let keep: (t('a), 'a => bool) => t('a) =
   (s, f) => {
     let output = empty();
-    s->forEach((v) =>
+    s->forEach(v =>
       if (f(v)) {
         output->addMut(v)->ignore;
       }
@@ -48,7 +49,7 @@ let keep: (t('a), 'a => bool) => t('a) =
 let keepMap: (t('a), 'a => option('b)) => t('b) =
   (s, f) => {
     let output = empty();
-    s->forEach((v) => {
+    s->forEach(v => {
       switch (f(v)) {
       | None => ()
       | Some(newV) => output->addMut(newV)->ignore
@@ -61,12 +62,10 @@ let keepMap: (t('a), 'a => option('b)) => t('b) =
 let copy: 'k 'a. t('a) => t('a) = s => s->toArray->fromArray;
 
 // Set a key in a dictionary, producing a new dictionary.
-let setPure: (t('a), 'a) => t('a) =
-  (s, v) =>
-  s->copy->addMut(v);
+let setPure: (t('a), 'a) => t('a) = (s, v) => s->copy->addMut(v);
 
 // Create a map with a single key and value
-let singleton: ('a) => t('a) = (v) => fromArray([|(v)|]);
+let singleton: 'a => t('a) = v => fromArray([|v|]);
 
 // Convert a Belt string set to a JS set
 let fromStringBeltSet: Belt.Set.String.t => t(string) =

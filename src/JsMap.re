@@ -18,11 +18,20 @@ external toArrayLike: t('k, 'v) => Js.Array.array_like(('k, 'v)) =
 [@bs.new]
 external fromArrayLike: Js.Array.array_like(('k, 'v)) => t('k, 'v) = "Map";
 [@bs.val] external toArray: t('k, 'v) => array(('k, 'v)) = "Array.from";
+
+// Convert a map to a list
 let toList: 'k 'a. t('k, 'a) => list(('k, 'a)) =
   m => m->toArray->Belt.List.fromArray;
+
+// True if the key exists in the map
 [@bs.send] external has: (t('k, 'v), 'k) => bool = "has";
+
+// Look up a key in the map.
 [@bs.send] [@bs.return nullable]
 external get: (t('k, 'v), 'k) => option('v) = "get";
+
+// How many key/value pairs in the map
+[@bs.send] external size: t('k, 'a) => int = "size";
 
 // Adding the `Mut` suffix to clarify that this is not a pure operation
 [@bs.send] external setMut: (t('k, 'v), 'k, 'v) => t('k, 'v) = "set";
@@ -31,8 +40,8 @@ external get: (t('k, 'v), 'k) => option('v) = "get";
 [@bs.send] external deleteMut: (t('k, 'v), 'k) => bool = "delete";
 
 // Iterate over *values* of the map
-[@bs.send] external forEachU: (t('k, 'v), (. 'v) => unit) => unit = "forEach";
-let forEach = (map, f) => map->forEachU((. v) => f(v));
+[@bs.send]
+external forEach: (t('k, 'v), [@bs.uncurry] ('v => unit)) => unit = "forEach";
 
 // Prefer `forEachWithKey` below but we need this binding
 [@bs.send]
@@ -109,7 +118,10 @@ let keepMap: 'k 'a 'b. (t('k, 'a), 'a => option('b)) => t('k, 'b) =
     output;
   };
 
-let keepMapWithKey: 'k 'a 'b. (t('k, 'a), ('k, 'a) => option('b)) => t('k, 'b) =
+let keepMapWithKey:
+  'k 'a 'b.
+  (t('k, 'a), ('k, 'a) => option('b)) => t('k, 'b)
+ =
   (m, f) => {
     let output = empty();
     m->forEachWithKey((k, v) => {
@@ -125,16 +137,16 @@ let keepMapWithKey: 'k 'a 'b. (t('k, 'a), ('k, 'a) => option('b)) => t('k, 'b) =
 let copy: 'k 'a. t('k, 'a) => t('k, 'a) = m => m->toArray->fromArray;
 
 // Set a key in a dictionary, producing a new dictionary.
-let setPure:  'k 'a. (t('k, 'a), 'k, 'a) => t('k, 'a) =
-  (m, k, v) =>
-  m->copy->setMut(k, v);
+let setPure: 'k 'a. (t('k, 'a), 'k, 'a) => t('k, 'a) =
+  (m, k, v) => m->copy->setMut(k, v);
 
 // Create a map with a single key and value
-let singleton:  'k 'a. ('k, 'a) => t('k, 'a) = (k, v) => fromArray([|(k, v)|]);
+let singleton: 'k 'a. ('k, 'a) => t('k, 'a) =
+  (k, v) => fromArray([|(k, v)|]);
 
 // Get or throw an exception if the key is not found. You can customize the
 // exception with the missing key.
-let getOrRaise:  'k 'a. (t('k, 'a), 'k, 'k => exn) => 'a =
+let getOrRaise: 'k 'a. (t('k, 'a), 'k, 'k => exn) => 'a =
   (m, k, toExn) =>
     switch (get(m, k)) {
     | None => raise(k->toExn)
@@ -175,3 +187,8 @@ let fromIntBeltMap: Belt.Map.Int.t('a) => t(int, 'a) =
 // Convert belt map
 let toIntBeltMap: t(int, 'a) => Belt.Map.Int.t('a) =
   m => Belt.Map.Int.fromArray(toArray(m));
+
+// Serialize a Map to JSON. This uses significant-data-last ordering for
+// mixing with encoders in `@glennsl/bs-json` (although it works standalone)
+let toJson = (innerToJson, m): Js.Json.t =>
+  m->map(innerToJson)->toDict->Js.Json.object_;

@@ -45,11 +45,12 @@ external forEach: (t('k, 'v), [@bs.uncurry] ('v => unit)) => unit = "forEach";
 
 // Prefer `forEachWithKey` below but we need this binding
 [@bs.send]
-external forEachValueKeyU: (t('k, 'v), (. 'v, 'k) => unit) => unit =
+external forEachValueKey:
+  (t('k, 'v), [@bs.uncurry] (('v, 'k) => unit)) => unit =
   "forEach";
 
 let forEachWithKey: (t('k, 'v), ('k, 'v) => unit) => unit =
-  (map, f) => map->forEachValueKeyU((. v, k) => f(k, v));
+  (map, f) => map->forEachValueKey((v, k) => f(k, v));
 
 [@bs.send]
 external entries: t('k, 'a) => Js.Array.array_like(('k, 'a)) = "entries";

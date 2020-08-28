@@ -103,6 +103,14 @@ module MapTests = {
       map->forEachWithKey((k, n) => sum := sum^ + n + k->Js.String.length);
       expect(sum^)->toEqual(9);
     });
+
+    test("toJson", () => {
+      expect(
+        fromArray([|("a", 1.0), ("b", 2.0), ("c", 3.0)|])
+        |> toJson(~k=s => s, ~v=Js.Json.number),
+      )
+      ->toEqual([%raw {|{a: 1, b: 2, c: 3}|}])
+    });
   });
 };
 
@@ -159,6 +167,11 @@ module SetTests = {
       ->toEqual([|"10", "20", "30"|]);
     });
 
+    test("addPure", () => {
+      let set1 = fromArray([|10, 20, 30|]);
+      expect(set1->addPure(9999)->toArray)->toEqual([|10, 20, 30, 9999|]);
+    });
+
     test("set operations", () => {
       let set1 = fromArray([|1, 2, 3|]);
       let set2 = fromArray([|4, 5, 6|]);
@@ -168,6 +181,12 @@ module SetTests = {
       expect(set1->union(set2))->toEqual(fromArray([|1, 2, 3, 4, 5, 6|]));
       expect(set1->union(set3))->toEqual(fromArray([|1, 2, 3, 4, 5|]));
       expect(set2->intersection(set3))->toEqual(fromArray([|4, 5|]));
+    });
+
+    test("mapping a function over a Set", () => {
+      let set1 = fromArray([|1.0, 2.0, 3.0|]);
+      expect(set1 |> toJson(Js.Json.number))
+      ->toEqual(Obj.magic([|1.0, 2.0, 3.0|]));
     });
   });
 };

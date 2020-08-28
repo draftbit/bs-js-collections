@@ -203,16 +203,19 @@ let toIntBeltMap: t(int, 'a) => Belt.Map.Int.t('a) =
 
 // Serialize a Map to JSON. This uses significant-data-last ordering for
 // mixing with encoders in `@glennsl/bs-json` (although it works standalone)
-let toJson = (innerToJson, m): Js.Json.t =>
-  m->map(innerToJson)->toDict->Js.Json.object_;
+let toJson: (~k: 'k => string, ~v: 'v => Js.Json.t, t('k, 'v)) => Js.Json.t =
+  (~k, ~v, m) =>
+    m->mapEntries((k', v') => (k(k'), v(v')))->toDict->Js.Json.object_;
 
-let union: 'a. (t('k, 'a), t('k, 'a)) => t('k, 'a) =
+let union: 'k 'a. (t('k, 'a), t('k, 'a)) => t('k, 'a) =
   (map1, map2) =>
     map2->reduceWithKey(
       map1->reduceWithKey(empty(), (m, k, v) => m->setMut(k, v)), (m, k, v) =>
       m->setMut(k, v)
     );
-let intersection: 'a. (t('k, 'a), t('k, 'a)) => t('k, 'a) =
+
+let intersection: 'k 'a. (t('k, 'a), t('k, 'a)) => t('k, 'a) =
   (map1, map2) => map1->keepKeys(map2->has);
-let diff: 'a. (t('k, 'a), t('k, 'a)) => t('k, 'a) =
+
+let diff: 'k 'a. (t('k, 'a), t('k, 'a)) => t('k, 'a) =
   (map1, map2) => map1->keepKeys(e => !map2->has(e));

@@ -29,8 +29,8 @@ external forEach: (t('a), [@bs.uncurry] ('a => unit)) => unit = "forEach";
 let reduce: 'a 'b. (t('a), 'b, ('b, 'a) => 'b) => 'b =
   (set, start, f) => set->toArray->Belt.Array.reduce(start, f);
 
-// Map a function over the values in a map. Note that the output type
-// must also be hashable -- this is on the developer to get right :)
+// Map a function over the set. Note that the output type must also be hashable,
+// this is on the developer to get right :)
 let map: (t('a), 'a => 'b) => t('b) =
   (s, f) => {
     let output = empty();
@@ -61,20 +61,22 @@ let keepMap: (t('a), 'a => option('b)) => t('b) =
     output;
   };
 
+// Create a copy of the set
+let copy: 'k 'a. t('a) => t('a) = s => s->toArray->fromArray;
+
+// Set a key in a set, producing a new set.
+let addPure: (t('a), 'a) => t('a) = (s, v) => s->copy->addMut(v);
+
 let union: 'a. (t('a), t('a)) => t('a) =
   (set1, set2) => set2->reduce(set1->reduce(empty(), addMut), addMut);
+
 let intersection: 'a. (t('a), t('a)) => t('a) =
   (set1, set2) => set1->keep(set2->has);
+
 let diff: 'a. (t('a), t('a)) => t('a) =
   (set1, set2) => set1->keep(e => !set2->has(e));
 
-// Create a copy of the map
-let copy: 'k 'a. t('a) => t('a) = s => s->toArray->fromArray;
-
-// Set a key in a dictionary, producing a new dictionary.
-let setPure: (t('a), 'a) => t('a) = (s, v) => s->copy->addMut(v);
-
-// Create a map with a single key and value
+// Create a set with a single item
 let singleton: 'a => t('a) = v => fromArray([|v|]);
 
 // Convert a Belt string set to a JS set
@@ -92,3 +94,8 @@ let fromIntBeltSet: Belt.Set.Int.t => t(int) =
 // Convert belt set
 let toIntBeltSet: t(int) => Belt.Set.Int.t =
   set => Belt.Set.Int.fromArray(toArray(set));
+
+// Convert to JSON
+let toJson: ('a => Js.Json.t, t('a)) => Js.Json.t =
+  (toJsonInner, set) =>
+    set->toArray->Belt.Array.map(toJsonInner)->Js.Json.array;

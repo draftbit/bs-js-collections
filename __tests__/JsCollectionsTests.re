@@ -188,5 +188,10 @@ module SetTests = {
       expect(set1 |> toJson(Js.Json.number))
       ->toEqual(Obj.magic([|1.0, 2.0, 3.0|]));
     });
+
+    test("dedupeArray", () =>
+      expect([|"a", "x", "b", "y", "x", "b", "z"|]->dedupeArray)
+      ->toEqual([|"a", "x", "b", "y", "z"|])
+    );
   });
 };

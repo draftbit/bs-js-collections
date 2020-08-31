@@ -99,3 +99,6 @@ let toIntBeltSet: t(int) => Belt.Set.Int.t =
 let toJson: ('a => Js.Json.t, t('a)) => Js.Json.t =
   (toJsonInner, set) =>
     set->toArray->Belt.Array.map(toJsonInner)->Js.Json.array;
+
+// Convenience function: deduplicate an array
+let dedupeArray: 'a. array('a) => array('a) = arr => arr->fromArray->toArray;

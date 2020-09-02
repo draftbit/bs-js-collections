@@ -31,15 +31,30 @@ module MapTests = {
       expect(map)->toEqual(fromArray([|(456, "qux")|]));
     });
 
+    test("immutable versions of mutable operations", () => {
+      let map = fromArray([|(123, "bar")|]);
+      expect(map->setPure(456, "qux")->get(456))->toEqual(Some("qux"));
+      expect(map->deletePure(123))->toEqual(empty());
+    });
+
     test("mapping a function over a Map", () => {
       let map1 = fromArray([|(1, 10), (2, 20), (3, 30)|]);
       expect(map1->map(string_of_int)->valuesArray)
       ->toEqual([|"10", "20", "30"|]);
+
       expect(map1->mapKeys(string_of_int)->toArray)
       ->toEqual([|("1", 10), ("2", 20), ("3", 30)|]);
+
+      expect(map1->mapWithKey((k, v) => string_of_int(k + v))->toArray)
+      ->toEqual([|(1, "11"), (2, "22"), (3, "33")|]);
+
+      expect(
+        map1->mapEntries((k, v) => (string_of_int(k), v + 1))->toArray,
+      )
+      ->toEqual([|("1", 11), ("2", 21), ("3", 31)|]);
     });
 
-    test("reduce/reduceWithKey", () => {
+    test("reducing", () => {
       let map = fromArray([|(123, "bar"), (456, "baz"), (789, "qux")|]);
 
       expect(map->reduce("", (s1, s2) => s1 ++ s2))->toEqual("barbazqux");
@@ -47,6 +62,14 @@ module MapTests = {
         map->reduceWithKey("", (s1, i, s2) => s1 ++ i->string_of_int ++ s2),
       )
       ->toEqual("123bar456baz789qux");
+    });
+
+    test("filtering", () => {
+      let map = fromArray([|(123, "bar"), (456, "baz"), (789, "qux")|]);
+
+      expect(map->keep(s => s == "bar"))->toEqual(singleton(123, "bar"));
+      expect(map->keepWithKey((k, s) => s == "bar" || k == 789))
+      ->toEqual(map->deletePure(456));
     });
 
     test("set operations", () => {
@@ -152,6 +175,12 @@ module SetTests = {
       let deleted = set->deleteMut(123);
       expect(deleted)->toBe(true);
       expect(set)->toEqual(fromArray([|456|]));
+    });
+
+    test("pure versions of mutable operations", () => {
+      let set = fromArray([|123, 456|]);
+      expect(set->addPure(789)->has(789))->toEqual(true);
+      expect(set->deletePure(123))->toEqual(fromArray([|456|]));
     });
 
     test("forEach", () => {

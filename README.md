@@ -8,9 +8,23 @@ some useful bells and whistles.
 ### Sets
 
 ```reason
-let myIntSet = JsSet.empty();
-[|1, 2, 3|]->Belt.Array.forEach(myIntSet->JsSet.add);
-myIntSet->JsSet.delete(1);
+// Construct empty, with a single element, or from an array
+let myEmptySet = JsSet.empty();
+let mySetWithOneString = JsSet.singleton("hello!");
+let myIntSet = [|1, 2, 3|]->JsSet.fromArray;
+
+// Mutably add some values to the set
+[|3, 4, 5|]->Belt.Array.forEach(myIntSet->JsSet.addMut);
+
+// Mutably delete values from the set
+myIntSet->JsSet.deleteMut(1);
+
+// Map functions over the set
+let myStringSet = myIntSet->JsString.map(string_of_int);
+
+// Filter the set
+let my
+
 Js.log(myIntSet->JsSet.size); // 2
 ```
 
@@ -24,11 +38,17 @@ Js.log(myStringMap->JsMap.has("y")); // true
 Js.log(myStringMap->Js.Map.get("y")); // 2
 ```
 
-See unit tests for more examples. In addition a number of higher-level
-utility functions are included, such as `map`, `keep`, `keepMap`, etc.
+In addition to bindings to the native API, this library adds a number
+of functions useful for pure functional programming, such as:
+
+* Conversion to/from various data structures such as arrays, lists,
+  dicts and `Belt` data structures
+* `map`, `keep`, `reduce`, including `*WithKey` versions for the Map type
+* Set operations such as `union`, `intersection` and `diff`
+
+See the `.rei` files for more tails, and unit tests examples of usage.
 In general we try to follow naming conventions similar to `Belt` and
-a pipe-first style. Note that many of these functions still require tests,
-so use with caution and your own testing.
+a pipe-first style.
 
 ## Usable types
 

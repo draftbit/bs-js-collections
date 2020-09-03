@@ -1,7 +1,19 @@
 # `bs-js-collections`
 
-Bindings to primitive JavaScript `Set` and `Map` types for BuckleScript/ReScript, plus
-some useful bells and whistles.
+Bindings to primitive JavaScript `Set` and `Map` types for
+BuckleScript/ReScript.
+
+In addition to bindings to the native API, this library adds a number
+of functions useful for pure functional programming, such as:
+
+* Conversion to/from various data structures such as arrays, lists,
+  dicts and `Belt` data structures
+* `map`, `keep`, `reduce`, including `*WithKey` versions for the Map type
+* Set operations such as `union`, `intersection` and `diff`
+
+It is largely influenced by `Belt`, following similar naming
+conventions and favoring fast-pipe argument order
+(i.e. significant-data-first).
 
 ## Examples
 
@@ -23,7 +35,10 @@ myIntSet->JsSet.deleteMut(1);
 let myStringSet = myIntSet->JsString.map(string_of_int);
 
 // Filter the set
-let my
+Js.log(myIntSet->keep(i => i < 3)); // { 1, 2 }
+
+// Filter and map the set
+Js.log(myIntSet->keepMap(i => i == 2 ? None : Some(i->string_of_int))); // { '1', '3' }
 
 Js.log(myIntSet->JsSet.size); // 2
 ```
@@ -37,14 +52,6 @@ Js.log(myStringMap->JsMap.size); // 1
 Js.log(myStringMap->JsMap.has("y")); // true
 Js.log(myStringMap->Js.Map.get("y")); // 2
 ```
-
-In addition to bindings to the native API, this library adds a number
-of functions useful for pure functional programming, such as:
-
-* Conversion to/from various data structures such as arrays, lists,
-  dicts and `Belt` data structures
-* `map`, `keep`, `reduce`, including `*WithKey` versions for the Map type
-* Set operations such as `union`, `intersection` and `diff`
 
 See the `.rei` files for more tails, and unit tests examples of usage.
 In general we try to follow naming conventions similar to `Belt` and

@@ -216,6 +216,10 @@ module SetTests = {
       let set1 = fromArray([|1.0, 2.0, 3.0|]);
       expect(set1 |> toJson(Js.Json.number))
       ->toEqual(Obj.magic([|1.0, 2.0, 3.0|]));
+      expect(set1->mapToArray(i => [|i|]))
+      ->toEqual([|[|1.0|], [|2.0|], [|3.0|]|]);
+      expect(set1->mapToList(i => [|i|]))
+      ->toEqual([[|1.0|], [|2.0|], [|3.0|]]);
     });
 
     test("dedupeArray", () =>

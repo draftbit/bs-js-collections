@@ -80,3 +80,7 @@ let toJson = (toJsonInner, set) =>
   set->toArray->Belt.Array.map(toJsonInner)->Js.Json.array;
 
 let dedupeArray = arr => arr->fromArray->toArray;
+
+let mapToArray = (set, f) => set->toArray->Belt.Array.map(f);
+
+let mapToList = (set, f) => set->toList->Belt.List.map(f);

@@ -20,7 +20,7 @@ let fromArray: array('a) => t('a);
 // Construct a set from an array-like.
 let fromArrayLike: Js.Array.array_like('a) => t('a);
 
-// Convert from an array.
+// Convert to an array.
 let toArray: t('a) => array('a);
 
 // Convert to an array-like
@@ -28,6 +28,14 @@ let toArrayLike: t('a) => Js.Array.array_like('a);
 
 // Convert to a list
 let toList: t('a) => list('a);
+
+// Convert to an array after mapping a function.
+// The function IS allowed to output non-hashable values.
+let mapToArray: (t('a), 'a => 'b) => array('b);
+
+// Convert to a list after mapping a function.
+// The function IS allowed to output non-hashable values.
+let mapToList: (t('a), 'a => 'b) => list('b);
 
 // True if the item is in the set
 let has: (t('a), 'a) => bool;

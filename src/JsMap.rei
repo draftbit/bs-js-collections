@@ -170,3 +170,12 @@ let intersection: (t('k, 'a), t('k, 'a)) => t('k, 'a);
 // Construct a map from all the keys which exist in the first map and not
 // in the second map.
 let diff: (t('k, 'a), t('k, 'a)) => t('k, 'a);
+
+// Group items in an array by a common result to a function. The key
+// type must be hashable by javascript -- the type system can't guarantee this.
+let groupBy: (array('a), 'a => 'k) => t('k, array('a));
+
+// Group an array of tuples. Each first element is a key in the resulting
+// map, and each second element appears in an array with other values
+// sharing the same key.
+let groupTuples: array(('k, 'v)) => t('k, array('v));

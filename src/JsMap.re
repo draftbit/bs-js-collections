@@ -173,3 +173,22 @@ let union = (map1, map2) =>
 let intersection = (map1, map2) => map1->keepKeys(map2->has);
 
 let diff = (map1, map2) => map1->keepKeys(e => !map2->has(e));
+
+let groupBy = (arr, f) => {
+  let result = empty();
+  arr->Belt.Array.forEach(item => {
+    let key = item->f;
+    let group = result->getOrSetDefaultMut(key, [||]);
+    group->Js.Array2.push(item)->ignore;
+  });
+  result;
+};
+
+let groupTuples = arr => {
+  let result = empty();
+  arr->Belt.Array.forEach(((key, item)) => {
+    let group = result->getOrSetDefaultMut(key, [||]);
+    group->Js.Array2.push(item)->ignore;
+  });
+  result;
+};

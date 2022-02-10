@@ -1,7 +1,7 @@
 {
-  "name": "bs-js-collections",
+  "name": "rescript-js-collections",
   "description": "Bindings to JavaScript primitive Set and Map types",
-  "version": "1.8.0",
+  "version": "1.8.1",
   "scripts": {
     "copy-git-hooks": "mkdir -p ./.git/hooks && cp -v ./hooks/* ./.git/hooks",
     "prepare": "yarn copy-git-hooks",
@@ -24,10 +24,10 @@
   },
   "license": "MIT",
   "peerDependencies": {
-    "bs-platform": "^7 || ^8"
+    "bs-platform": "^7 || ^8 || ^9"
   },
   "devDependencies": {
-    "bs-platform": "^8",
+    "bs-platform": "^9",
     "jest": "^26.4.2",
     "lint-staged": "^10.2.11",
     "prettier": "^2.1.0",

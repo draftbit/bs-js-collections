@@ -1,6 +1,6 @@
 {
-  "name": "bs-js-collections",
-  "version": "0.1.0",
+  "name": "rescript-js-collections",
+  "version": "1.8.21",
   "sources": [
     {
       "dir": "src",

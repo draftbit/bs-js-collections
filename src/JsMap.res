@@ -1,18 +1,18 @@
 type t<'k, 'v>
 
-@bs.new external empty: unit => t<'k, 'v> = "Map"
+@new external empty: unit => t<'k, 'v> = "Map"
 
-@bs.new external fromArray: array<('k, 'v)> => t<'k, 'v> = "Map"
+@new external fromArray: array<('k, 'v)> => t<'k, 'v> = "Map"
 
 let fromList = l => l->Belt.List.toArray->fromArray
 
-@bs.new
+@new
 external fromArrayLike: Js.Array.array_like<('k, 'v)> => t<'k, 'v> = "Map"
 
 @bs.send
 external entries: t<'k, 'a> => Js.Array.array_like<('k, 'a)> = "entries"
 
-@bs.val
+@val
 external entriesArray: t<'k, 'v> => array<('k, 'v)> = "Array.from"
 
 // Convert a map to a list
@@ -31,21 +31,21 @@ let valuesList = m => m->valuesArray->Belt.List.fromArray
 
 @bs.send external has: (t<'k, 'v>, 'k) => bool = "has"
 
-@bs.send @bs.return(nullable)
+@bs.send @return(nullable)
 external get: (t<'k, 'v>, 'k) => option<'v> = "get"
 
-@bs.get external size: t<'k, 'a> => int = "size"
+@get external size: t<'k, 'a> => int = "size"
 
 @bs.send external setMut: (t<'k, 'v>, 'k, 'v) => t<'k, 'v> = "set"
 
 @bs.send external deleteMut: (t<'k, 'v>, 'k) => bool = "delete"
 
 @bs.send
-external forEach: (t<'k, 'v>, @bs.uncurry ('v => unit)) => unit = "forEach"
+external forEach: (t<'k, 'v>, @uncurry ('v => unit)) => unit = "forEach"
 
 // This binding is only used internally (`forEachWithKey` is exported)
 @bs.send
-external forEachValueKey: (t<'k, 'v>, @bs.uncurry ('v, 'k) => unit) => unit = "forEach"
+external forEachValueKey: (t<'k, 'v>, @uncurry ('v, 'k) => unit) => unit = "forEach"
 
 let forEachWithKey = (map, f) => map->forEachValueKey((v, k) => f(k, v))
 

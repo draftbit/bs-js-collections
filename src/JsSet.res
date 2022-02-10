@@ -1,14 +1,14 @@
 type t<'a>
 
-@bs.new external empty: unit => t<'a> = "Set"
+@new external empty: unit => t<'a> = "Set"
 
-@bs.new external fromArray: array<'a> => t<'a> = "Set"
+@new external fromArray: array<'a> => t<'a> = "Set"
 
-@bs.val external toArray: t<'a> => array<'a> = "Array.from"
+@val external toArray: t<'a> => array<'a> = "Array.from"
 
 let copy = s => s->toArray->fromArray
 
-@bs.new external fromArrayLike: Js.Array.array_like<'a> => t<'a> = "Set"
+@new external fromArrayLike: Js.Array.array_like<'a> => t<'a> = "Set"
 
 external toArrayLike: t<'a> => Js.Array.array_like<'a> = "%identity"
 
@@ -16,7 +16,7 @@ let toList: t<'a> => list<'a> = s => s->toArray->Belt.List.fromArray
 
 @bs.send external has: (t<'a>, 'a) => bool = "has"
 
-@bs.get external size: t<'a> => int = "size"
+@get external size: t<'a> => int = "size"
 
 @bs.send external addMut: (t<'a>, 'a) => t<'a> = "add"
 
@@ -27,7 +27,7 @@ let addPure = (s, v) => s->copy->addMut(v)
 let deletePure = (s, v) => s->toArray->Belt.Array.keep(x => x != v)->fromArray
 
 @bs.send
-external forEach: (t<'a>, @bs.uncurry ('a => unit)) => unit = "forEach"
+external forEach: (t<'a>, @uncurry ('a => unit)) => unit = "forEach"
 
 let reduce = (set, start, f) => set->toArray->Belt.Array.reduce(start, f)
 

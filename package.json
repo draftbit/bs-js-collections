@@ -18,6 +18,9 @@
     "*.{re,rei}": [
       "bsrefmt --in-place"
     ],
+    "*.{res,resi}": [
+      "bash formateach.sh"
+    ],
     "*.{json,yaml}": [
       "prettier --write"
     ]

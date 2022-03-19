@@ -171,6 +171,9 @@ let intersection: (t<'k, 'a>, t<'k, 'a>) => t<'k, 'a>
 // in the second map.
 let diff: (t<'k, 'a>, t<'k, 'a>) => t<'k, 'a>
 
+// Convert an array to a map given a function to make a key for an object in the array.
+let keyBy: (array<'a>, 'a => 'k) => t<'k, 'a>
+
 // Group items in an array by a common result to a function. The key
 // type must be hashable by javascript -- the type system can't guarantee this.
 let groupBy: (array<'a>, 'a => 'k) => t<'k, array<'a>>

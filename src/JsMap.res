@@ -187,3 +187,5 @@ let groupTuples = arr => {
   })
   result
 }
+
+let keyBy = (arr, toKey) => arr->Js.Array2.map(x => (x->toKey, x))->fromArray
